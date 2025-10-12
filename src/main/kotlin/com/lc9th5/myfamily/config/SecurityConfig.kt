@@ -10,6 +10,7 @@ import org.springframework.security.config.Customizer.withDefaults
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -31,7 +32,7 @@ class SecurityConfig(
         org.springframework.security.core.userdetails.User
             .withUsername(user.email)
             .password(user.password)
-            .authorities(user.roles.map { "ROLE_${it.name}" })
+            .authorities(user.roles.map { SimpleGrantedAuthority("ROLE_${it.name}") })
             .accountExpired(false)
             .accountLocked(false)
             .credentialsExpired(false)
@@ -57,7 +58,7 @@ class SecurityConfig(
             .cors(withDefaults())
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
-                it.requestMatchers("/api/auth/**").permitAll()
+                it.requestMatchers("/api/auth/**", "/api/users/register").permitAll()
                     .anyRequest().authenticated()
             }
             .oauth2ResourceServer { oauth2 ->

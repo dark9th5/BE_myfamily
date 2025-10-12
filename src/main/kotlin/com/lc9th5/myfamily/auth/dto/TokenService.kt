@@ -1,4 +1,4 @@
-package com.lc9th5.myfamily.auth
+package com.lc9th5.myfamily.auth.dto
 
 import com.lc9th5.myfamily.model.user.User
 import org.springframework.beans.factory.annotation.Value
@@ -6,6 +6,7 @@ import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.JwsHeader
 import org.springframework.security.oauth2.jwt.JwtClaimsSet
 import org.springframework.security.oauth2.jwt.JwtEncoder
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -31,7 +32,8 @@ class TokenService(
             .build()
 
         val jwsHeader = JwsHeader.with(MacAlgorithm.HS256).build()
-        val token = jwtEncoder.encode { it.headers { h -> h.headers(jwsHeader.headers) }.claims { _ -> claims } }.tokenValue
+        val params = JwtEncoderParameters.from(jwsHeader, claims)
+        val token = jwtEncoder.encode(params).tokenValue
         val ttl = expirationSeconds
         return token to ttl
     }

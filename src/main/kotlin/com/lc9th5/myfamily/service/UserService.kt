@@ -13,11 +13,12 @@ class UserService(
     private val passwordEncoder: PasswordEncoder
 ) {
     @Transactional
-    fun register(email: String, rawPassword: String, fullName: String?): User {
-        if (userRepository.existsByEmail(email)) {
+    fun register(username: String, email: String, rawPassword: String, fullName: String?): User {
+        if (userRepository.existsByEmail(email.trim().lowercase())) {
             throw IllegalArgumentException("Email already registered")
         }
         val user = User(
+            username = username.trim(),
             email = email.trim().lowercase(),
             password = passwordEncoder.encode(rawPassword),
             fullName = fullName?.trim(),
@@ -26,5 +27,6 @@ class UserService(
         return userRepository.save(user)
     }
 
-    fun findByEmail(email: String): User? = userRepository.findByEmail(email.trim().lowercase())
+    fun findByEmail(email: String): User? =
+        userRepository.findByEmail(email.trim().lowercase())
 }
