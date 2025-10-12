@@ -1,11 +1,11 @@
-package com.lc9th5.myfamily
+package com.lc9th5
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class MyfamilyApplication
+class MyFamilyApplication
 
 fun main(args: Array<String>) {
-	runApplication<MyfamilyApplication>(*args)
+    runApplication<MyFamilyApplication>(*args)
 }

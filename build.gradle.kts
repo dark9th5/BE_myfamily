@@ -37,7 +37,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	compileOnly("org.projectlombok:lombok")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.mysql:mysql-connector-j")
 	annotationProcessor("org.projectlombok:lombok")
@@ -45,6 +46,10 @@ dependencies {
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    // Google token verification
+    implementation("com.google.api-client:google-api-client:2.6.0")
+    implementation("com.google.http-client:google-http-client-jackson2:1.44.2") // JacksonFactory
+
 }
 
 kotlin {
