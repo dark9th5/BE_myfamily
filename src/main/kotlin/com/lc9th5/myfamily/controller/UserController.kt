@@ -1,7 +1,7 @@
 package com.lc9th5.myfamily.controller
 
 
-import com.lc9th5.myfamily.model.User
+import com.lc9th5.myfamily.model.user.User
 import com.lc9th5.myfamily.service.UserService
 import org.springframework.web.bind.annotation.*
 

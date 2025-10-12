@@ -1,4 +1,4 @@
-package com.lc9th5.myfamily.model
+package com.lc9th5.myfamily.model.user
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
