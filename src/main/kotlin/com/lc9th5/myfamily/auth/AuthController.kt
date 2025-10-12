@@ -2,13 +2,11 @@ package com.lc9th5.myfamily.auth
 
 import com.lc9th5.myfamily.security.JwtTokenService
 import com.lc9th5.myfamily.security.TokenResponse
+import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtException
@@ -30,11 +28,10 @@ class AuthController(
     private val authenticationManager: AuthenticationManager,
     private val jwtTokenService: JwtTokenService,
     private val jwtDecoder: JwtDecoder,
-    private val userDetailsService: UserDetailsService,
-    @Value("\${security.jwt.issuer}") private val issuer: String
+    private val userDetailsService: UserDetailsService
 ) {
     @PostMapping("/login")
-    fun login(@RequestBody req: LoginRequest): TokenResponse {
+    fun login(@Valid @RequestBody req: LoginRequest): TokenResponse {
         val auth = authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(req.username, req.password)
         )
@@ -42,7 +39,7 @@ class AuthController(
     }
 
     @PostMapping("/refresh")
-    fun refresh(@RequestBody req: RefreshRequest): TokenResponse {
+    fun refresh(@Valid @RequestBody req: RefreshRequest): TokenResponse {
         try {
             val jwt = jwtDecoder.decode(req.refresh_token)
 
@@ -67,11 +64,4 @@ class AuthController(
             throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Cannot refresh token")
         }
     }
-
-    @GetMapping("/me")
-    fun me(@AuthenticationPrincipal user: UserDetails?): Map<String, Any?> =
-        mapOf(
-            "username" to user?.username,
-            "roles" to user?.authorities?.map { it.authority }
-        )
 }
