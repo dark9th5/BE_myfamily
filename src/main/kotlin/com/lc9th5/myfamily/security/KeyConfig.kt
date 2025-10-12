@@ -7,11 +7,16 @@ import com.nimbusds.jose.proc.SecurityContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
+import org.springframework.security.oauth2.core.OAuth2Error
+import org.springframework.security.oauth2.core.OAuth2TokenValidator
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult
 import org.springframework.security.oauth2.jwt.*
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
+import java.time.Duration
 import java.util.*
 
 @Configuration
@@ -40,10 +45,27 @@ class KeysConfig {
     @Bean
     fun jwtDecoder(
         rsaKey: RSAKey,
-        @Value("\${security.jwt.issuer}") issuer: String
+        @Value("\${security.jwt.issuer}") issuer: String,
+        @Value("\${security.audience:}") audience: String?
     ): JwtDecoder {
         val decoder = NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build()
-        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuer))
+
+        val issuerValidator = JwtValidators.createDefaultWithIssuer(issuer)
+
+        val audienceValidator = OAuth2TokenValidator<Jwt> { jwt ->
+            if (audience.isNullOrBlank() || jwt.audience.contains(audience)) {
+                OAuth2TokenValidatorResult.success()
+            } else {
+                OAuth2TokenValidatorResult.failure(
+                    OAuth2Error("invalid_token", "Invalid audience", null)
+                )
+            }
+        }
+
+        // Nới clock skew 60s bằng JwtTimestampValidator
+        val timestampValidator = JwtTimestampValidator(Duration.ofSeconds(60))
+
+        decoder.setJwtValidator(DelegatingOAuth2TokenValidator(issuerValidator, audienceValidator, timestampValidator))
         return decoder
     }
 }
