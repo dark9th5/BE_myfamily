@@ -4,12 +4,9 @@ import com.lc9th5.myfamily.security.JwtTokenService
 import com.lc9th5.myfamily.security.TokenResponse
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtException
@@ -31,8 +28,7 @@ class AuthController(
     private val authenticationManager: AuthenticationManager,
     private val jwtTokenService: JwtTokenService,
     private val jwtDecoder: JwtDecoder,
-    private val userDetailsService: UserDetailsService,
-    @Value("\${security.jwt.issuer}") private val issuer: String
+    private val userDetailsService: UserDetailsService
 ) {
     @PostMapping("/login")
     fun login(@Valid @RequestBody req: LoginRequest): TokenResponse {
