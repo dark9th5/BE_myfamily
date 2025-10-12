@@ -1,9 +1,5 @@
-package com.lc9th5.myfamily.auth
+package com.lc9th5.myfamily.auth.dto
 
-import com.lc9th5.myfamily.auth.dto.AuthResponse
-import com.lc9th5.myfamily.auth.dto.LoginRequest
-import com.lc9th5.myfamily.auth.dto.RegisterRequest
-import com.lc9th5.myfamily.auth.dto.TokenService
 import com.lc9th5.myfamily.service.UserService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -22,7 +18,12 @@ class AuthController(
 
     @PostMapping("/register")
     fun register(@RequestBody @Valid body: RegisterRequest): ResponseEntity<AuthResponse> {
-        val user = userService.register(body.email, body.password, body.fullName)
+        val user = userService.register(
+            body.username,
+            body.email,
+            body.password,
+            body.fullName
+        )
         val (token, expiresIn) = tokenService.generateAccessToken(user)
         val resp = AuthResponse(
             accessToken = token,
