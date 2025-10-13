@@ -10,11 +10,11 @@ group = "com.lc9th5"
 version = "0.0.1-SNAPSHOT"
 description = "project for family"
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
-}
+// java {
+// 	toolchain {
+// 		languageVersion = JavaLanguageVersion.of(21)
+// 	}
+// }
 
 configurations {
 	compileOnly {

@@ -16,12 +16,12 @@ import javax.crypto.spec.SecretKeySpec
 
 @Configuration
 class JwtConfig(
-    @Value("\${security.jwt.secret}") private val secret: String
+    private val jwtProperties: JwtProperties
 ) {
 
     private fun secretKeySpec(): SecretKeySpec {
         // Secret dạng chuỗi; bạn có thể để dạng Base64 và decode nếu muốn
-        val keyBytes = secret.toByteArray(StandardCharsets.UTF_8)
+        val keyBytes = jwtProperties.secret.toByteArray(StandardCharsets.UTF_8)
         return SecretKeySpec(keyBytes, "HmacSHA256")
     }
 

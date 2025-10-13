@@ -22,13 +22,18 @@ class SecurityConfig(
     private val userRepository: UserRepository
 ) {
 
+    // Mã hóa mật khẩu 
     @Bean
-    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder(12)
-
+    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder(12) 
+    
+    // Cung cấp UserDetailsService để load user từ database
     @Bean
     fun userDetailsService(): UserDetailsService = UserDetailsService { username ->
-        val user = userRepository.findByEmail(username)
-            ?: throw org.springframework.security.core.userdetails.UsernameNotFoundException("User not found")
+        val user = if (username.contains("@")) {
+            userRepository.findByEmail(username)
+        } else {
+            userRepository.findByUsername(username)
+        } ?: throw org.springframework.security.core.userdetails.UsernameNotFoundException("User not found")
         org.springframework.security.core.userdetails.User
             .withUsername(user.email)
             .password(user.password)
@@ -38,9 +43,7 @@ class SecurityConfig(
             .credentialsExpired(false)
             .disabled(false)
             .build()
-    }
-
-    @Bean
+    }    @Bean
     fun authenticationManager(
         userDetailsService: UserDetailsService,
         passwordEncoder: PasswordEncoder
@@ -54,14 +57,14 @@ class SecurityConfig(
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .csrf { it.disable() }
-            .cors(withDefaults())
-            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .csrf { it.disable() } // Disable CSRF cho API
+            .cors(withDefaults()) // Enable CORS với cấu hình mặc định
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) } // Stateless session (JWT)
             .authorizeHttpRequests {
                 it.requestMatchers("/api/auth/**", "/api/users/register").permitAll()
                     .anyRequest().authenticated()
             }
-            .oauth2ResourceServer { oauth2 ->
+            .oauth2ResourceServer { oauth2 ->// Cấu hình Resource Server để sử dụng JWT
                 oauth2.jwt(withDefaults())
             }
         return http.build()
