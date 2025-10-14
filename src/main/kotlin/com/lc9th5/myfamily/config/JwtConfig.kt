@@ -20,26 +20,39 @@ class JwtConfig(
 ) {
 
     private fun secretKeySpec(): SecretKeySpec {
-        // Secret dạng chuỗi; bạn có thể để dạng Base64 và decode nếu muốn
+        // Chuyển đổi chuỗi bí mật thành SecretKeySpec
+        // Đảm bảo rằng chuỗi bí mật đủ dài cho thuật toán HS256 (ít nhất 32 ký tự)
         val keyBytes = jwtProperties.secret.toByteArray(StandardCharsets.UTF_8)
-        return SecretKeySpec(keyBytes, "HmacSHA256")
+        // Nếu chuỗi bí mật ngắn hơn 64 byte, ta sẽ padding nó
+        // Nếu dài hơn, ta sẽ cắt bớt
+        val paddedKeyBytes = if (keyBytes.size < 32) {
+            keyBytes + ByteArray(32 - keyBytes.size) { 0 } // Padding với byte 0 nếu cần
+        } else {
+            keyBytes.copyOf(32) // Cắt bớt nếu dài hơn 32 byte
+        }
+        return SecretKeySpec(paddedKeyBytes, "HmacSHA256") // Sử dụng HmacSHA256 cho HS256
     }
-
+    // Cấu hình JwtEncoder sử dụng thuật toán HS256
+    @Bean
+    fun jwtEncoder(): JwtEncoder {
+        // Tạo JWK từ secret key
+        // JWK dùng để mã hóa và giải mã JWT
+        val jwk = OctetSequenceKey.Builder(secretKeySpec()).build() 
+        // jwSet dùng để chứa JWK, đóng gói jwk vào JWKSet
+        val jwkSet = JWKSet(jwk) 
+        // Tạo JWKSource từ JWKSet
+        // JWKSource dùng để cung cấp JWK cho JwtEncoder
+        val jwkSource = com.nimbusds.jose.jwk.source.JWKSource<SecurityContext> { selector, _ ->
+            selector.select(jwkSet)
+        }
+        return NimbusJwtEncoder(jwkSource)
+    }
+    // Cấu hình JwtDecoder và JwtEncoder sử dụng thuật toán HS256
     @Bean
     fun jwtDecoder(): JwtDecoder {
         return NimbusJwtDecoder
             .withSecretKey(secretKeySpec())
             .macAlgorithm(MacAlgorithm.HS256)
             .build()
-    }
-
-    @Bean
-    fun jwtEncoder(): JwtEncoder {
-        val jwk = OctetSequenceKey.Builder(secretKeySpec()).build()
-        val jwkSet = JWKSet(jwk)
-        val jwkSource = com.nimbusds.jose.jwk.source.JWKSource<SecurityContext> { selector, _ ->
-            selector.select(jwkSet)
-        }
-        return NimbusJwtEncoder(jwkSource)
     }
 }

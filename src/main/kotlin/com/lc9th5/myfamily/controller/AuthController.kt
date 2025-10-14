@@ -1,5 +1,9 @@
-package com.lc9th5.myfamily.auth.dto
+package com.lc9th5.myfamily.controller
 
+import com.lc9th5.myfamily.auth.dto.AuthResponse
+import com.lc9th5.myfamily.auth.dto.LoginRequest
+import com.lc9th5.myfamily.auth.dto.RegisterRequest
+import com.lc9th5.myfamily.service.TokenService
 import com.lc9th5.myfamily.service.UserService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus

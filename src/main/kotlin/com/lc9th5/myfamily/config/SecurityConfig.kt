@@ -48,9 +48,9 @@ class SecurityConfig(
         userDetailsService: UserDetailsService,
         passwordEncoder: PasswordEncoder
     ): AuthenticationManager {
-        val provider = DaoAuthenticationProvider()
-        provider.setUserDetailsService(userDetailsService)
-        provider.setPasswordEncoder(passwordEncoder)
+        val provider = DaoAuthenticationProvider(userDetailsService).apply {
+            setPasswordEncoder(passwordEncoder)
+        }
         return ProviderManager(provider)
     }
 
@@ -65,7 +65,7 @@ class SecurityConfig(
                     .anyRequest().authenticated()
             }
             .oauth2ResourceServer { oauth2 ->// Cấu hình Resource Server để sử dụng JWT
-                oauth2.jwt(withDefaults())
+                oauth2.jwt(withDefaults()) // Sử dụng  jwtDecoder để giải mã và xác thực JWT
             }
         return http.build()
     }

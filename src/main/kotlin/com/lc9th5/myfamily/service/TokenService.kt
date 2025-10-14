@@ -1,6 +1,14 @@
-package com.lc9th5.myfamily.auth.dto
+package com.lc9th5.myfamily.service
 
 import com.lc9th5.myfamily.config.JwtProperties
+import com.lc9th5.myfamily.model.user.User
+import org.springframework.stereotype.Service
+import org.springframework.security.oauth2.jwt.JwtEncoder
+import org.springframework.security.oauth2.jwt.JwtClaimsSet
+import org.springframework.security.oauth2.jwt.JwsHeader
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm
+import java.time.Instant
 
 @Service
 class TokenService(
