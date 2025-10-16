@@ -39,6 +39,12 @@ data class User(
     @Column(name = "role")
     var roles: MutableSet<Role> = mutableSetOf(Role.USER),
 
+    @Column(name = "is_verified", nullable = false)
+    var isVerified: Boolean = false,
+
+    @Column(name = "verification_code")
+    var verificationCode: String? = null,
+
     @Column(name = "created_at")
     @CreationTimestamp
     val createdAt: LocalDateTime? = null
